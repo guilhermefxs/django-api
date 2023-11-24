@@ -1,0 +1,202 @@
+openapi: 3.0.0
+info:
+  title: Minha API Django
+  version: 1.0.0
+security:
+  - APIKey: []
+
+paths:
+  /profile-list/:
+    get:
+      summary: Lista de Perfis
+      description: Retorna uma lista de perfis.
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - id: 1
+                  email: "john.doe@example.com"
+                  is_superuser: false
+                  username: "john",
+                  name: "John Doe"
+                  profileImage: "/media/profiles/john_doe.jpg"
+
+  /profile-create/:
+    post:
+      summary: Criar Perfil
+      description: Cria um novo perfil.
+
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                profileImage: {}
+                username:
+                  type: string
+                password:
+                  type: string
+            encoding:
+              profileImage:
+                contentType: image/*
+
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              example:
+                id: 7,
+                email: "guilherme223@hotmail.com",
+                is_superuser: false,
+                username: "gui223",
+                name: "Guilherme223",
+                profileImage: "/media/20230211_152041_Jqwyclf.jpg"
+          '400':
+          description: Bad Request
+          content:
+            application/json:
+              example: "The user info is not valid"
+
+  /get-user-agreement/:
+    get:
+      summary: Obter Acordo do Usuário
+      description: Retorna o Acordo do Usuário em formato PDF.
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf:
+              example: user-agreement.pdf
+
+  /login/:
+    post:
+      summary: Login do Usuário
+      description: Autentica o usuário e retorna um token.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              username: "john.doe@example.com"
+              password: "senha_segura"
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                token: "token_gerado"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example: "Credenciais inválidas"
+
+  /logout/:
+    post:
+      summary: Logout do Usuário
+      description: Invalida o token de autenticação do usuário.
+      security:
+        - APIKey: []
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: {"message": "Logout realizado com sucesso."}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example: {"error": "Erro interno no servidor"}
+
+  /team-create/:
+    post:
+      summary: Criar Time
+      description: Cria um novo time.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              - nome: "Novo Time"
+                data_fundacao: "2023-01-01"
+                cores: "Azul e Branco"
+                localizacao: "Cidade Nova"
+                isOnSerieA: true
+
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              example:
+                id: 4
+                nome: "Novo Time"
+                data_fundacao: "2023-01-01"
+                cores: "Azul e Branco"
+                localizacao: "Cidade Nova"
+                isOnSerieA: true
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example: "Erro na criação do time"
+
+  /teams-list/:
+    get:
+      summary: Lista de Times
+      description: Retorna uma lista de times com opções de filtragem.
+      security:
+        - APIKey: []
+
+      parameters:
+        - name: search
+          in: query
+          description: Filtro por nome, cor ou localização do time.
+          schema:
+            type: string
+        - name: isOnSerieA
+          in: query
+          description: Filtro por times na Série A.
+          schema:
+            type: boolean
+        - name: orderBy
+          in: query
+          description: Ordenar por atributo específico.
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                - id: 1
+                  nome: "Time 1"
+                  data_fundacao: "2022-01-01"
+                  cores: "Vermelho e Branco"
+                  localizacao: "Cidade 1"
+                  isOnSerieA: true
+                - id: 2
+                  nome: "Time 2"
+                  data_fundacao: "2022-02-01"
+                  cores: "Azul e Amarelo"
+                  localizacao: "Cidade 2"
+                  isOnSerieA: false
